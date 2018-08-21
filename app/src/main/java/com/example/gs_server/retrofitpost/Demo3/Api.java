@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 
 public interface Api {
 
+    // url a la que haremos la peticion
     String url = "https://www.simplifiedcoding.net/demos/";
 
     @GET("marvel")

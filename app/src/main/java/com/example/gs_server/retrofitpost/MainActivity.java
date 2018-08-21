@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.example.gs_server.retrofitpost.Demo3.Api;
 import com.example.gs_server.retrofitpost.Demo3.Heroes;
@@ -37,12 +39,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        list = (RecyclerView) findViewById(R.id.list_recycle);
+        // inicias la lista RecycleView
+        list = findViewById(R.id.list_recycle);
 
+        // se piden los persmisos necesarios (son pruebas)
         permiission();
+
+        // haces la peticion a la URL que declares... con Retrofit
         RetrofiPeticionHeroes();
     }
 
+
+    // metodo paara pedir los permisos necesarios
     public void permiission() {
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
@@ -55,19 +63,24 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{
                             Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
                     0);
 
 
         } else {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
                     0);
 
         }
     }
 
+    // metodo para la peticion por medio de retrofit.
     public void RetrofiPeticionHeroes() {
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -80,13 +93,16 @@ public class MainActivity extends AppCompatActivity {
         lis.enqueue(new Callback<List<Heroes>>() {
             @Override
             public void onResponse(Call<List<Heroes>> call, Response<List<Heroes>> response) {
+                // recuperas los valores de la peticion y los asignas a tu clase o Bean
                 listBody = response.body();
                 list.setHasFixedSize(true);
+                // estilo de la lista (RecycleView)
                 mLayoutManager = new LinearLayoutManager(getApplicationContext());
                 list.setLayoutManager(mLayoutManager);
+                // asignamos el adapter creado. de la clase MyAdapter y pasamos la lista que mostrara
                 mAdapter = new MyAdapter(getApplicationContext(), listBody);
+                // pasamos el adapter a la lista..
                 list.setAdapter(mAdapter);
-
             }
 
             @Override
@@ -95,9 +111,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     @SuppressLint("LongLogTag")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        // validacion de que si no acepta los valores
         if (requestCode == 0) {
 
             if (verifyPermissions(grantResults)) {
@@ -107,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                 dialog.setTitle("Permisos Denegados !!");
                 dialog.setMessage("Esta Aplicacion necesita la autorizacion de los Permisos");
-                dialog.setCancelable(false);
+
                 dialog.setPositiveButton("ACEPTAR", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -115,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                         permiission();
                     }
                 });
+                dialog.setCancelable(false);
                 dialog.show();
 
             }
